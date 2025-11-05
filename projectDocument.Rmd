@@ -33,6 +33,21 @@ La importancia del estudio de los datos en este problema radica en comprender a 
 
 - Valor agregado del análisis realizado.
 
+El analisis Realizada aporta un enfoque integral y aplicado al problema de las reseñas falsas en aplicaciónes móviles, combinando técnicas estadísticas, procesamiento de lenguahe natural y analisis muiltilingue. 
+A diferencia de estudios previos centrados solo en inglés o en datos de comercio electronico, este proyecto **aborda la detección de spam en un entorno global y multilingue, lo que refleja de manera más realista el comportamiento actual de los usuarios en tiendas de aplicaciónes. 
+
+El uso del algoritmo **Naive Bayes Multinomial** proporciona un modelo ligero, interpetrable y eficiente, capaz de manejar grandes volúmenes de texto con un costo computaciónal bajo. 
+
+Este enfoque permite identificar patrones lingüísticos y variables contextuales —como país, dispositivo, rating o verificación de compra— que influyen en la probabilidad de que una reseña sea falsa.
+
+Ademas, el proyecto agregar valor al: 
+-**Integrar variables adicionales** del dataset, para enriquecer la detección de spam. 
+
+-**Estandarizar el preprocesamiento multilingue**. 
+
+-**Contribuir a la transparencia digital**, ofreciendo un método que puede ser implementado, para mejorar la confianza de sus usuarios.
+
+
 # 3. Objetivos
 - **General**: Enunciar el objetivo principal del proyecto.
 
@@ -62,7 +77,27 @@ El modelo presente busca evaluar y predecir que tipo de contenido en reseña mul
 
 
 - Formular preguntas de investigación o hipótesis que orienten la minería de datos.
-- Identificar la relevancia del problema y su impacto en la toma de decisiones.
+
+Preguntas de investigación
+-1. ¿Qué caracteristicas textuales y de usuario, influyen con mayor frecuencia en la generación de reseñas falsas o de tipo spam?
+-2. ¿Existen diferencias significativas en la proporción de reseñas falsas entre distintos idiomas o categorias de aplicacióne moviles?
+-3. ¿Puedes el algoritmo Naive Bayes Multinomial clasificar con presición aceptable (superior al 70%) las reseñas falsas basandose en el contenido textual y variables complementarias?
+-4. ¿El comportamiento de las variables “verified_purchase” y “rating” muestra correlación con la probabilidad de que una reseña sea falsa?
+
+##Hipótesis de investigación
+-1. H1: Las reseñas con lenguaje repetitivo, puntuaciónes extremas y sin verificación de compra presentan mayor probabilidad de ser clasificadas como spam. 
+-2. H2: El algoritmo naives bayes, es capaz de detectar reseñas falsas con un nivel de precision superior al 80%.
+-3. H3: Existen diferencias significativas entre idiomas en la frecuencia de reseñas falsas, debido a la diversidad linguística y culturall de los usuarios. 
+-4. H4: Variables demográficas comoedad y pais del usuario influyen en el comportamiento de publicación de reseñas falsas o aunténticas
+-5 H5: La combinación de texto y metadatos, mejora el rendimiento del modelo frente a usar solo texto. 
+
+Estas preguntas e hipótesis orienta a la mineria de datos a: 
+- identificar patrones de comportamiento y lenguaje asociados a spam. 
+- Evaluar la capacidad predictiva del modelo naive bayes. 
+- Explorar relaciones ocultas entre variables cualitativas y cuantitativas.
+
+
+##Identificar la relevancia del problema y su impacto en la toma de decisiones.
 
 La relevancia del problema se centra en la necesidad de asegurar la autenticidad de las reseñas en plataformas digitales. La presencia de reseñas falsas o SPAM afecta la credibilidad de los sistemas de valoración y puede distorsionar la percepción que los usuarios tienen sobre un producto o servicio.
 
@@ -229,12 +264,15 @@ colSums(is.na(Copia_Datos_Limpios)[, c("user_country", "review_text", "rating")]
 ```{r}
 sapply(Copia_Datos_Limpios,class)
 ```
+
 ```{r}
 language <- unique(Copia_Datos_Limpios$review_language)
 print(language)
 typeof(language)
 
 ```
+
+
 ```{r}
 # Asegurar que review_language sea texto
 Copia_Datos_Limpios$review_language <- as.character(Copia_Datos_Limpios$review_language)
@@ -246,6 +284,9 @@ Copia_Datos_Limpios$review_language[Copia_Datos_Limpios$review_language == "zh"]
 unique(Copia_Datos_Limpios$review_language)
 
 ```
+
+
+
 ```{r}
 translate_review_text <- function(text, target = "en", key, endpoint, region = "global") {
   print(text)
@@ -283,6 +324,8 @@ translate_review_text <- function(text, target = "en", key, endpoint, region = "
   return(translated_text)
 }
 ```
+
+
 ```{r}
 # --- Configuración Azure ---
 
@@ -320,7 +363,9 @@ Copia_Datos_Limpios$translated <- pmap_chr(
   }
 )
 ```
+
 - marcar como Spam para frases que se repiten 
+
 
 ```{r}
 Copia_Datos_Limpios$is_duplicated <-
@@ -343,7 +388,10 @@ valid_words <- c(
   "download", "install", "upgrade", "bug", "error", "crash", "fix", "solution"
 )
 ```
+
 -Función para evaluación de texto valido
+
+
 ```{r}
 # Función para evaluar si un texto es válido
 is_valid_review <- function(text) {
@@ -361,7 +409,11 @@ is_valid_review <- function(text) {
   return(has_valid_word)
 }
 ```
+
+
 - Evaluación del dataset
+
+
 ```{r}
 Copia_Datos_Limpios <- Copia_Datos_Limpios %>%
   mutate(
@@ -447,7 +499,11 @@ Copia_Datos_Limpios <- Copia_Datos_Limpios %>%
   ) %>%
   select(-detected_language) # Eliminar columna auxiliar si no es necesaria
 ```
+
+
 - Muestra los valores que se consideran reseñas verdaderas
+
+
 ```{r}
 unique(Copia_Datos_Limpios$spam_verified)
 values_verified <- Copia_Datos_Limpios %>% filter(spam_verified == "ham")
@@ -498,7 +554,9 @@ is_latin <- function(text) {
 ```{r}
 is_latin("Nulla ullam quo iure repudiandae.")
 ```
+
 - Clasificación de spam valores como lorem ipsum
+
 ```{r}
 Copia_Datos_Limpios <- Copia_Datos_Limpios %>%
   mutate(
